@@ -45,8 +45,12 @@ exports.createTour = catchAsync(async (req, res) => {
 });
 
 exports.updateTour = catchAsync(async (req, res) => {
+  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body);
   res.status(200).json({
     status: "success",
+    data: {
+      tour,
+    },
   });
 });
 
