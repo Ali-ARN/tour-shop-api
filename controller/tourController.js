@@ -80,3 +80,28 @@ exports.deleteTour = catchAsync(async (req, res) => {
     status: "success",
   });
 });
+
+exports.getTourStats = catchAsync(async (req, res) => {
+  const stats = await Tour.aggregate([
+    {
+      $group: {
+        _id: null,
+        numTours: { $sum: 1 },
+        avgPrice: { $avg: "$price" },
+        minPrice: { $min: "$price" },
+        maxPrice: { $max: "$price" },
+        numRatings: { $sum: "$ratingsQuantity" },
+        avgRatings: { $avg: "$ratingsAverage" },
+        minRating: { $min: "$ratingsAverage" },
+        maxRating: { $max: "$ratingsAverage" },
+      },
+    },
+  ]);
+  if (!stats) return new AppError(404, "something went very wrong");
+  res.status(200).json({
+    status: "success",
+    data: {
+      stats,
+    },
+  });
+});
