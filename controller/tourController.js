@@ -105,3 +105,36 @@ exports.getTourStats = catchAsync(async (req, res) => {
     },
   });
 });
+
+exports.getMonthlyPlan = catchAsync(async (req, res) => {
+  const monthly = await Tour.aggregate([
+    { $unwind: "$startDates" },
+    {
+      $match: {
+        startDates: {
+          $gt: new Date(`${req.params.year}-01-01`),
+          $lt: new Date(`${req.params.year}-12-31`),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: { $month: "$startDates" },
+        numTours: { $sum: 1 },
+        tours: { $push: "$name" },
+      },
+    },
+
+    {
+      $sort: { numTours: -1 },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "success",
+    months: monthly.length,
+    data: {
+      monthly,
+    },
+  });
+});
