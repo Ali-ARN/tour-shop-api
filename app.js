@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 dotenv.config();
 const app = express();
 const tourRoute = require("./routes/tourRoute");
+const errorHandler = require("./controller/errorController");
 
 app.use(express.json());
 
@@ -17,11 +18,7 @@ mongoose
 app.use("/api/v1/tours", tourRoute);
 
 // global error controller
-app.all("*", (req, res) => {
-  res.status(404).json({
-    status: "error",
-  });
-});
+app.all("*", errorHandler);
 
 const port = process.env.PORT || 8080;
 

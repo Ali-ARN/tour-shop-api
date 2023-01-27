@@ -1,7 +1,7 @@
 const Tour = require("../model/tourModel");
 const catchAsync = require("../utilities/catchAsync");
 const APIFeatures = require("../utilities/apiFeatures");
-
+const AppError = require("../utilities/appError");
 exports.getTours = catchAsync(async (req, res) => {
   console.log(req.query);
   // creating query
@@ -13,6 +13,7 @@ exports.getTours = catchAsync(async (req, res) => {
 
   // executing query
   const tours = await features.query;
+
   res.status(200).json({
     status: "success",
     results: tours.length,
@@ -25,6 +26,10 @@ exports.getTours = catchAsync(async (req, res) => {
 exports.getOneTour = catchAsync(async (req, res) => {
   const tour = await Tour.findById(req.params.id);
 
+  if (!tour) {
+    return new AppError(404, "Invalid tour id");
+  }
+
   res.status(200).json({
     status: "success",
     data: {
@@ -36,7 +41,11 @@ exports.getOneTour = catchAsync(async (req, res) => {
 exports.createTour = catchAsync(async (req, res) => {
   const newTour = await Tour.create(req.body);
 
-  res.status(200).json({
+  if (!newTour) {
+    return new AppError(404, "something went very wrong");
+  }
+
+  res.status(201).json({
     status: "success",
     data: {
       tour: newTour,
@@ -45,7 +54,15 @@ exports.createTour = catchAsync(async (req, res) => {
 });
 
 exports.updateTour = catchAsync(async (req, res) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body);
+  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!tour) {
+    return new AppError(404, "something went very wrong");
+  }
+
   res.status(200).json({
     status: "success",
     data: {
@@ -55,7 +72,10 @@ exports.updateTour = catchAsync(async (req, res) => {
 });
 
 exports.deleteTour = catchAsync(async (req, res) => {
-  await Tour.findByIdAndDelete(req.params.id);
+  const tour = await Tour.findByIdAndDelete(req.params.id);
+  if (!tour) {
+    return new AppError(404, "something went very wrong");
+  }
   res.status(200).json({
     status: "success",
   });
