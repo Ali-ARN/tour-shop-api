@@ -44,3 +44,8 @@ _PAGINATION_:
 ### Delete tour
 
 `DELETE localhost:3000/api/v1/tours/{id_palceholder}`
+
+### More features
+
+get tour stats: `GET localhost:3000/api/v1/tours/stats`
+get monthly plans: `GET localhost:3000/api/v1/tours/monthly-plan/:year`
