@@ -48,4 +48,5 @@ _PAGINATION_:
 ### More features
 
 get tour stats: `GET localhost:3000/api/v1/tours/stats`
+
 get monthly plans: `GET localhost:3000/api/v1/tours/monthly-plan/:year`
