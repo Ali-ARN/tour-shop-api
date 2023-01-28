@@ -10,22 +10,22 @@ for starting server, do `npm i` then `npm start`
 
 **also you can use filter, sort, limit fields and pagination with queries**
 
-**FILTER**:
+_FILTER_:
 
 `GET localhost:3000/api/v1/tours?price=1500` | this will return tours with 1500 price
 
-**SORT**:
+_SORT_:
 
 `GET localhost:3000/api/v1/tours?sort=price` | this will sort tours by price (ascending) |
 **for descending you must use a '-' before the field**
 
-**LIMIT FIELDS**:
+_LIMIT FIELDS_:
 
 `GET localhost:3000/api/v1/tours?fields=name,price` | include name and price, exclude others
 
 `GET localhost:3000/api/v1/tours?fields=-name,-price` | exclude name and price, include others
 
-**PAGINATION**:
+_PAGINATION_:
 
 `GET localhost:3000/api/v1/tours?page=2&limit=10` | i think this is clear, so no need to explain :)
 
