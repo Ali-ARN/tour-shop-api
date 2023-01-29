@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 dotenv.config();
 const app = express();
 const tourRoute = require("./routes/tourRoute");
+const userRoute = require("./routes/userRoute");
 const errorHandler = require("./controller/errorController");
 
 app.use(express.json());
@@ -16,6 +17,7 @@ mongoose
 
 // ROUTES
 app.use("/api/v1/tours", tourRoute);
+app.use("/api/v1/users", userRoute);
 
 // global error controller
 app.all("*", errorHandler);
