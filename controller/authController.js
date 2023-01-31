@@ -4,6 +4,12 @@ const handleError = require("./errorController");
 const AppError = require("../utilities/appError");
 const jwt = require("jsonwebtoken");
 
+const signToken = (id) => {
+  jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
 exports.signup = async (req, res, next) => {
   try {
     const newUser = await User.create({
@@ -13,9 +19,7 @@ exports.signup = async (req, res, next) => {
       passwordConfirm: req.body.passwordConfirm,
     });
 
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
+    const token = signToken(newUser._id);
 
     if (!newUser) return new AppError(404, "something went very wrong");
 
@@ -44,10 +48,12 @@ exports.login = async (req, res, next) => {
     // 3) search for that email to find the user
     const user = await User.findOne({ email }).select("+password");
 
-    // 4) check if user exists, if not returns an error
-    if (!user) return next(new AppError(404, "no user found with thi email"));
+    // 4) check if user exists or password is correct
+    if (!user || !(await user.correctPassword(password, user.password))) {
+      return next(new AppError(401, "Incorrect email or password"));
+    }
 
-    const token = "";
+    const token = signToken(user._id);
     res.status(200).json({
       status: "success",
       token,
