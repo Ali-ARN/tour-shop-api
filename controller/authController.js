@@ -1,3 +1,4 @@
+const { promisify } = require("util");
 const User = require("../model/userModel");
 const catchAsync = require("../utilities/catchAsync");
 const handleError = require("./errorController");
@@ -5,7 +6,7 @@ const AppError = require("../utilities/appError");
 const jwt = require("jsonwebtoken");
 
 const signToken = (id) => {
-  jwt.sign({ id }, process.env.JWT_SECRET, {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
@@ -54,12 +55,40 @@ exports.login = async (req, res, next) => {
     }
 
     const token = signToken(user._id);
+    console.log(token);
     res.status(200).json({
       status: "success",
       token,
-      user,
     });
   } catch (err) {
     next(err);
   }
 };
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1) Geting token and check if it's there
+  const { authorization } = req.headers;
+  let token;
+  if (authorization && authorization.startsWith("Bearer")) {
+    token = authorization.split(" ")[1];
+  }
+
+  // console.log(token);
+
+  if (!token)
+    return next(
+      new AppError(
+        401,
+        "You are not logged in, you have to log in to get access"
+      )
+    );
+
+  // 2) Verfication token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  console.log(decoded);
+  // 3) check if user still exists
+
+  // 4) check if user changed password after the token was issued
+
+  next();
+});

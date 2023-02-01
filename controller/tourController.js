@@ -3,7 +3,6 @@ const catchAsync = require("../utilities/catchAsync");
 const APIFeatures = require("../utilities/apiFeatures");
 const AppError = require("../utilities/appError");
 exports.getTours = catchAsync(async (req, res) => {
-  console.log(req.query);
   // creating query
   const features = new APIFeatures(Tour.find(), req.query)
     .filter()
