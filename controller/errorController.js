@@ -73,7 +73,7 @@ exports.globalErrorHandler = (err, req, res, next) => {
     if (error.name === "TokenExpiredError")
       error = handleJWTExpiredError(error);
 
-    sendErrorProd(error);
+    sendErrorProd(error, res);
   }
 };
 
