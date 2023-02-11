@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -13,12 +14,8 @@ const userSchema = new mongoose.Schema({
     unique: [true, "user email must be unique"],
     validate: [validator.isEmail, "please enter a valid email"],
   },
-
   photo: String,
-  role: {
-    type: String,
-    enum: ["user", "admin", "guide", "lead-guide"],
-  },
+  role: { type: String },
   password: {
     type: String,
     required: [true, "A user must have a password"],
@@ -39,9 +36,9 @@ const userSchema = new mongoose.Schema({
     },
   },
 
-  changedPasswordAt: {
-    type: Date,
-  },
+  changedPasswordAt: Date,
+  resetPasswordToken: String,
+  resetPasswordTokenExpiresIn: Date,
 });
 
 userSchema.pre("save", async function (next) {
@@ -70,6 +67,18 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
     return JWTTimestamp < changeTimestamp;
   }
   return false;
+};
+
+userSchema.methods.createResetPasswordToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.resetPasswordTokenExpiresIn = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);
