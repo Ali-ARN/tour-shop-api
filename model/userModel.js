@@ -41,6 +41,8 @@ const userSchema = new mongoose.Schema({
   resetPasswordTokenExpiresIn: Date,
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
 userSchema.pre("save", async function (next) {
   // Only runs this function if password was modified
   if (!this.isModified("password")) return next();
@@ -53,9 +55,23 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.changedPasswordAt = Date.now() - 1;
+
+  next();
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
 userSchema.methods.correctPassword = async function (password, userPassword) {
   return await bcrypt.compare(password, userPassword);
 };
+
+//////////////////////////////////////////////////////////////////////////////////////////////
 
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.changedPasswordAt) {
@@ -68,6 +84,8 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   }
   return false;
 };
+
+//////////////////////////////////////////////////////////////////////////////////////////////
 
 userSchema.methods.createResetPasswordToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
