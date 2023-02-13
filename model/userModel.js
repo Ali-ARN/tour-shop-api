@@ -43,6 +43,7 @@ const userSchema = new mongoose.Schema({
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
+// Sign up middleware
 userSchema.pre("save", async function (next) {
   // Only runs this function if password was modified
   if (!this.isModified("password")) return next();
@@ -57,6 +58,7 @@ userSchema.pre("save", async function (next) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
+// Update password middleware
 userSchema.pre("save", function (next) {
   if (!this.isModified("password") || this.isNew) return next();
 
