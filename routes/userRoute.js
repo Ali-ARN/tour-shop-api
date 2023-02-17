@@ -18,6 +18,12 @@ router.patch(
   authController.protect,
   userController.updateProfile
 );
+
+router.delete(
+  "/deleteProfile",
+  authController.protect,
+  userController.deleteProfile
+);
 router
   .route("/")
   .get(userController.getAllUsers)
