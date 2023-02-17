@@ -5,6 +5,7 @@ const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
+const hpp = require("hpp");
 dotenv.config();
 const app = express();
 const tourRoute = require("./routes/tourRoute");
@@ -34,6 +35,20 @@ app.use(mongoSanitize());
 
 // Data sanitizaiotn against XSS
 app.use(xss());
+
+// Prevent parameter pollution
+app.use(
+  hpp({
+    whitelist: [
+      "duration",
+      "price",
+      "difficulty",
+      "maxGroupSize",
+      "ratingsAverage",
+      "ratingsQuantity",
+    ],
+  })
+);
 
 // Body parser
 app.use(express.json({ limit: "10kb" }));
