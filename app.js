@@ -2,13 +2,14 @@ const express = require("express");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
 dotenv.config();
 const app = express();
 const tourRoute = require("./routes/tourRoute");
 const userRoute = require("./routes/userRoute");
 const errorController = require("./controller/errorController");
-
-app.use(express.json());
 
 // DATABASE
 mongoose.set("strictQuery", true);
@@ -18,6 +19,8 @@ mongoose
   .catch((err) => console.error(err.message));
 
 // GLOBAL MIDDLEWARES
+app.use(helmet());
+
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
@@ -25,6 +28,15 @@ const limiter = rateLimit({
 });
 
 app.use("/api", limiter);
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitizaiotn against XSS
+app.use(xss());
+
+// Body parser
+app.use(express.json({ limit: "10kb" }));
 // ROUTES
 app.use("/api/v1/tours", tourRoute);
 app.use("/api/v1/users", userRoute);
