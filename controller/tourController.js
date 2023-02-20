@@ -2,7 +2,7 @@ const Tour = require("../model/tourModel");
 const catchAsync = require("../utilities/catchAsync");
 const APIFeatures = require("../utilities/apiFeatures");
 const AppError = require("../utilities/appError");
-exports.getTours = catchAsync(async (req, res) => {
+exports.getTours = catchAsync(async (req, res, next) => {
   // creating query
   const features = new APIFeatures(Tour.find(), req.query)
     .filter()
@@ -22,11 +22,11 @@ exports.getTours = catchAsync(async (req, res) => {
   });
 });
 
-exports.getOneTour = catchAsync(async (req, res) => {
+exports.getOneTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
 
   if (!tour) {
-    return new AppError(404, "Invalid tour id");
+    return next(new AppError(404, "Invalid tour id"));
   }
 
   res.status(200).json({
@@ -37,11 +37,11 @@ exports.getOneTour = catchAsync(async (req, res) => {
   });
 });
 
-exports.createTour = catchAsync(async (req, res) => {
+exports.createTour = catchAsync(async (req, res, next) => {
   const newTour = await Tour.create(req.body);
 
   if (!newTour) {
-    return new AppError(404, "something went very wrong");
+    return next(new AppError(404, "something went very wrong"));
   }
 
   res.status(201).json({
@@ -52,14 +52,14 @@ exports.createTour = catchAsync(async (req, res) => {
   });
 });
 
-exports.updateTour = catchAsync(async (req, res) => {
+exports.updateTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
 
   if (!tour) {
-    return new AppError(404, "something went very wrong");
+    return next(new AppError(404, "something went very wrong"));
   }
 
   res.status(200).json({
@@ -70,17 +70,19 @@ exports.updateTour = catchAsync(async (req, res) => {
   });
 });
 
-exports.deleteTour = catchAsync(async (req, res) => {
+exports.deleteTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
   if (!tour) {
-    return new AppError(404, "something went very wrong");
+    return next(new AppError(404, "something went very wrong"));
   }
   res.status(200).json({
     status: "success",
   });
 });
 
-exports.getTourStats = catchAsync(async (req, res) => {
+// Aggregations
+
+exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
     {
       $group: {
@@ -96,7 +98,7 @@ exports.getTourStats = catchAsync(async (req, res) => {
       },
     },
   ]);
-  if (!stats) return new AppError(404, "something went very wrong");
+  if (!stats) return next(new AppError(404, "something went very wrong"));
   res.status(200).json({
     status: "success",
     data: {
@@ -105,7 +107,7 @@ exports.getTourStats = catchAsync(async (req, res) => {
   });
 });
 
-exports.getMonthlyPlan = catchAsync(async (req, res) => {
+exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   const monthly = await Tour.aggregate([
     { $unwind: "$startDates" },
     {
