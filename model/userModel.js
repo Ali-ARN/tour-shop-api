@@ -15,7 +15,6 @@ const userSchema = new mongoose.Schema({
     validate: [validator.isEmail, "please enter a valid email"],
   },
   photo: String,
-  role: { type: String },
   password: {
     type: String,
     required: [true, "A user must have a password"],
@@ -45,6 +44,8 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
+    enum: ["user", "guide", "guide-leader", "admin"],
+    default: "user",
   },
 });
 
@@ -74,6 +75,7 @@ userSchema.pre("save", function (next) {
   next();
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////////
 userSchema.pre(/^find/, function (next) {
   this.find({ active: true });
   next();
