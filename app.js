@@ -10,6 +10,7 @@ dotenv.config();
 const app = express();
 const tourRoute = require("./routes/tourRoute");
 const userRoute = require("./routes/userRoute");
+const reviewRoute = require("./routes/reviewRoute");
 const errorController = require("./controller/errorController");
 
 // DATABASE
@@ -17,7 +18,7 @@ mongoose.set("strictQuery", true);
 mongoose
   .connect(process.env.DATABASE)
   .then(() => console.log("database connected"))
-  .catch((err) => console.error(err.message));
+  .catch(err => console.error(err.message));
 
 // GLOBAL MIDDLEWARES
 app.use(helmet());
@@ -55,6 +56,7 @@ app.use(express.json({ limit: "10kb" }));
 // ROUTES
 app.use("/api/v1/tours", tourRoute);
 app.use("/api/v1/users", userRoute);
+app.use("/api/v1/reviews", reviewRoute);
 
 // global error controller
 app.use(errorController.globalErrorHandler);
