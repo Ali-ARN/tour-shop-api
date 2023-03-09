@@ -107,6 +107,13 @@ const tourSchema = new mongoose.Schema(
         description: String,
       },
     ],
+
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     toJSON: {
@@ -120,6 +127,15 @@ const tourSchema = new mongoose.Schema(
 
 tourSchema.virtual("durationWeek").get(function () {
   return this.duration / 7;
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt",
+  });
+
+  next();
 });
 
 module.exports = mongoose.model("Tour", tourSchema, "tours");
