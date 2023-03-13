@@ -45,3 +45,8 @@ exports.deleteProfile = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+exports.getProfile = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
