@@ -50,7 +50,6 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.login = catchAsync(async (req, res, next) => {
   // 1) get the email and password
   const { email, password } = req.body;
-  console.log(email, password);
   // 2) check if user provided any email or password
   if (!email || !password) {
     return new AppError(400, "please provide email and password!");
@@ -72,8 +71,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (authorization && authorization.startsWith("Bearer")) {
     token = authorization.split(" ")[1];
   }
-
-  // console.log(token);
 
   if (!token)
     return next(
