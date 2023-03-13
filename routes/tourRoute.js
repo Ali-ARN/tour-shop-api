@@ -11,7 +11,7 @@ router.use("/:tourId/reviews", reviewRoute);
 
 router
   .route("/")
-  .get(authController.protect, tourController.getTours)
+  .get(authController.protect, tourController.getAllTours)
   .post(tourController.createTour);
 
 router
