@@ -11,13 +11,19 @@ router.use("/:tourId/reviews", reviewRoute);
 
 router
   .route("/")
-  .get(authController.protect, tourController.getAllTours)
-  .post(tourController.createTour);
+  .get(tourController.getAllTours)
+  .post(
+    authController.restrictTo("admin", "lead-guides"),
+    tourController.createTour
+  );
 
 router
   .route("/:id")
   .get(tourController.getOneTour)
-  .patch(tourController.updateTour)
+  .patch(
+    authController.restrictTo("admin", "lead-guide"),
+    tourController.updateTour
+  )
   .delete(
     authController.protect,
     authController.restrictTo("admin", "lead-guide"),
