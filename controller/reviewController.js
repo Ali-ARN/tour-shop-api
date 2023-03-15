@@ -2,7 +2,7 @@ const catchAsync = require("../utilities/catchAsync");
 const AppError = require("../utilities/appError");
 const Review = require("../model/reviewModel");
 const factory = require("./handlerFactory");
-exports.setUserAndTourIds = () => {
+exports.setUserAndTourIds = (req, res, next) => {
   req.body.tour ||= req.params.tourId;
   req.body.user ||= req.user.id;
   next();
