@@ -8,7 +8,9 @@ router.route("/stats").get(tourController.getTourStats);
 router.route("/monthly-plan/:year").get(tourController.getMonthlyPlan);
 
 router.use("/:tourId/reviews", reviewRoute);
-
+router
+  .route("/tours-within/:distance/center/:latlng/unit/:unit")
+  .get(tourController.getToursWithin);
 router
   .route("/")
   .get(tourController.getAllTours)
